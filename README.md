@@ -1,19 +1,27 @@
-# ClaudeStatus
+# ClaudeStatus 📊
 
-Native macOS-Statusleisten-App, die deine aktuelle Claude.ai-Subscription-Auslastung anzeigt:
+A native macOS menu bar app that shows your current Claude.ai subscription usage at a glance:
 
-- 5-Stunden-Session in Prozent (Ampelfarbe in der Menüleiste)
-- 7-Tage-Wochenlimit
-- 7-Tage-Opus-Limit (nur wenn genutzt)
-- Reset-Countdown je Limit
+- ⏱️ 5-hour rolling session in percent (with traffic-light color in the menu bar)
+- 📅 7-day weekly limit
+- 🧠 7-day Opus limit (only shown when used)
+- ⏳ Reset countdown for each limit
 
-## Voraussetzungen
+## ✨ Features
 
-- macOS 14 Sonoma oder neuer
-- Xcode Command Line Tools (`xcode-select --install`)
-- Aktives Claude.ai Pro- oder Max-Abo
+- 🍏 100% native SwiftUI, no Electron, no web view
+- 🪶 Tiny footprint, no Dock icon, no main window
+- 🔒 `sessionKey` stored securely in the macOS Keychain
+- 🚦 Traffic-light icon: green < 60%, yellow < 85%, red ≥ 85%
+- 🔄 Refreshes every 60 seconds
 
-## Bauen und installieren
+## 📋 Requirements
+
+- 🖥️ macOS 14 Sonoma or newer
+- 🛠️ Xcode Command Line Tools (`xcode-select --install`)
+- 💳 An active Claude.ai Pro or Max subscription
+
+## 🚀 Build and install
 
 ```bash
 cd ClaudeStatus
@@ -22,54 +30,58 @@ mv build/ClaudeStatus.app /Applications/
 open /Applications/ClaudeStatus.app
 ```
 
-Das Skript baut eine Release-Version und packt sie in ein `.app`-Bundle mit `LSUIElement = true`, damit kein Dock-Icon erscheint. Die Ad-hoc-Signatur reicht für lokalen Eigenbetrieb.
+The script builds a release version and packages it as a `.app` bundle with `LSUIElement = true`, so no Dock icon shows up. The ad-hoc signature is sufficient for local personal use.
 
-Beim ersten Start fragt macOS einmal nach der Erlaubnis, weil die App nicht notarisiert ist. Falls Gatekeeper blockiert: `Systemeinstellungen → Datenschutz & Sicherheit → "Trotzdem öffnen"`.
+On first launch, macOS asks for permission once because the app is not notarized. If Gatekeeper blocks it: `System Settings → Privacy & Security → "Open Anyway"`. 🔓
 
-## sessionKey eintragen
+## 🔑 Set the sessionKey
 
-Beim ersten Start zeigt das Menüleisten-Icon einen durchgestrichenen Schlüssel. Klick darauf, dann **Einstellungen**, dann den `sessionKey` aus claude.ai einfügen.
+On first launch, the menu bar icon shows a crossed-out key. Click it, then **Settings**, then paste the `sessionKey` from claude.ai.
 
-So kommst du an den `sessionKey`:
+How to get the `sessionKey`:
 
-1. https://claude.ai im Browser öffnen, eingeloggt sein.
-2. DevTools öffnen (`Cmd + Option + I`).
-3. Tab **Application** (Chrome) bzw. **Storage** (Safari) → **Cookies** → `https://claude.ai`.
-4. Eintrag `sessionKey` markieren, **Value** kopieren (langer String, beginnt mit `sk-ant-sid01-…`).
-5. In der App in das Settings-Feld einfügen, speichern.
+1. 🌐 Open https://claude.ai in your browser, make sure you are logged in.
+2. 🛠️ Open DevTools (`Cmd + Option + I`).
+3. 📂 Tab **Application** (Chrome) or **Storage** (Safari) → **Cookies** → `https://claude.ai`.
+4. 🔍 Find the `sessionKey` entry, copy its **Value** (a long string starting with `sk-ant-sid01-…`).
+5. 📥 Paste it into the settings field, save.
 
-Der Cookie wird im macOS-Keychain abgelegt. Er hält typischerweise einige Wochen. Wenn das Icon ein Warndreieck zeigt, ist er abgelaufen — Schritte oben wiederholen.
+The cookie is stored in the macOS Keychain. It typically lives for a few weeks. When the icon shows a warning triangle ⚠️, it expired — repeat the steps above.
 
-## Autostart bei Login
+## 🌅 Autostart at login
 
-Bis ein dedizierter Settings-Toggle existiert: in `Systemeinstellungen → Allgemein → Anmeldeobjekte → +` die `ClaudeStatus.app` hinzufügen.
+Until a dedicated settings toggle exists: in `System Settings → General → Login Items → +` add `ClaudeStatus.app`.
 
-## Was die App nicht tut
+## 🚫 What this app does NOT do
 
-- Keine Kostenschätzung in EUR (die Datenquelle liefert keine Token-Counts, eine Schätzung wäre zu wackelig).
-- Kein Zugriff auf Claude-Code-CLI-Daten oder Anthropic-Console.
-- Kein Verlauf, keine Diagramme, keine Push-Benachrichtigungen.
+- ❌ No EUR cost estimation (the data source does not return token counts, any estimate would be too unreliable)
+- ❌ No access to Claude Code CLI data or the Anthropic Console
+- ❌ No history, no charts, no push notifications
 
-## Hinweise
+## ⚠️ Notes
 
-Der genutzte Endpoint `https://claude.ai/api/organizations/{org}/usage` ist **inoffiziell**. Anthropic kann ihn jederzeit ändern. Bei Schema-Brüchen zeigt die App eine Fehlermeldung und parst defensiv.
+The endpoint used (`https://claude.ai/api/organizations/{org}/usage`) is **unofficial**. Anthropic may change it at any time. The app parses defensively and shows an error if the schema breaks.
 
-Behandle den `sessionKey` wie ein Passwort. Wer ihn besitzt, ist als du bei Claude.ai eingeloggt. Die App speichert ihn ausschließlich lokal im Keychain und überträgt ihn nur in den Cookie-Header von Anfragen an `claude.ai`.
+Treat the `sessionKey` like a password 🔐. Anyone who has it is logged in to claude.ai as you. The app stores it locally in the Keychain only and only sends it in the `Cookie` header of requests to `claude.ai`.
 
-## Projektstruktur
+## 🗂️ Project structure
 
 ```
 ClaudeStatus/
 ├── Package.swift
-├── build-app.sh            # baut .app-Bundle mit LSUIElement
+├── build-app.sh                  # builds .app bundle with LSUIElement
 └── Sources/ClaudeStatus/
     ├── ClaudeStatusApp.swift     # @main, MenuBarExtra
     ├── Models/UsageSnapshot.swift
     ├── Services/
-    │   ├── ClaudeAPIClient.swift # URLSession-Wrapper
-    │   └── KeychainStore.swift   # Cookie & Org-ID im Keychain
-    ├── State/UsageStore.swift    # ObservableObject, 60s-Polling
+    │   ├── ClaudeAPIClient.swift # URLSession wrapper
+    │   └── KeychainStore.swift   # cookie & org id in Keychain
+    ├── State/UsageStore.swift    # ObservableObject, 60s polling
     └── Views/
         ├── PopoverView.swift
         └── SettingsView.swift
 ```
+
+## 📜 License
+
+MIT — use it, fork it, break it, fix it. 🛠️
