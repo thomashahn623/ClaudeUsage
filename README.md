@@ -21,6 +21,10 @@ A native macOS menu bar app that shows your current Claude.ai subscription usage
 - 🛠️ Xcode Command Line Tools (`xcode-select --install`)
 - 💳 An active Claude.ai Pro or Max subscription
 
+## 📦 Download a prebuilt release
+
+Grab the latest `.zip` from the [Releases page](../../releases), unzip, drag `ClaudeStatus.app` into `/Applications`, double-click. Done. ✅
+
 ## 🚀 Build and install
 
 ```bash
