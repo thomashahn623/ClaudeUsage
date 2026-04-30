@@ -1,5 +1,9 @@
 # ClaudeStatus 📊
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="ClaudeStatus popover showing usage and time-window bars" width="320">
+</p>
+
 A native macOS menu bar app that shows your current Claude.ai subscription usage at a glance:
 
 - ⏱️ 5-hour rolling session in percent (with traffic-light color in the menu bar)
