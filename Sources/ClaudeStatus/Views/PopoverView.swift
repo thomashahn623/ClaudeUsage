@@ -25,13 +25,16 @@ struct PopoverView: View {
             if let snap = store.snapshot {
                 metricRow(title: "5-Stunden-Session",
                           metric: snap.fiveHour,
+                          windowDuration: 5 * 3600,
                           color: store.trafficColor)
                 metricRow(title: "7-Tage-Limit",
                           metric: snap.sevenDay,
+                          windowDuration: 7 * 24 * 3600,
                           color: .blue)
                 if let opus = snap.sevenDayOpus, opus.utilization > 0 {
                     metricRow(title: "7-Tage-Opus",
                               metric: opus,
+                              windowDuration: 7 * 24 * 3600,
                               color: .purple)
                 }
 
@@ -68,7 +71,8 @@ struct PopoverView: View {
     }
 
     @ViewBuilder
-    private func metricRow(title: String, metric: UsageMetric, color: Color) -> some View {
+    private func metricRow(title: String, metric: UsageMetric, windowDuration: TimeInterval, color: Color) -> some View {
+        let timeProgress = timeProgress(for: metric, windowDuration: windowDuration)
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(title).font(.subheadline)
@@ -79,12 +83,33 @@ struct PopoverView: View {
             }
             ProgressView(value: min(metric.utilization, 100) / 100)
                 .tint(color)
+            if let timeProgress {
+                HStack {
+                    Text("Zeitfenster")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text("\(Int((timeProgress * 100).rounded()))%")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
+                ProgressView(value: timeProgress)
+                    .tint(.secondary)
+            }
             if let reset = metric.resetsAt {
                 Text("Reset \(formatReset(reset))")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
         }
+    }
+
+    private func timeProgress(for metric: UsageMetric, windowDuration: TimeInterval) -> Double? {
+        guard let reset = metric.resetsAt, windowDuration > 0 else { return nil }
+        let start = reset.addingTimeInterval(-windowDuration)
+        let elapsed = now.timeIntervalSince(start)
+        return min(max(elapsed / windowDuration, 0), 1)
     }
 
     private func formatReset(_ date: Date) -> String {
