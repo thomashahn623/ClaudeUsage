@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-09
+
+### Changed
+- CI and release workflows migrated from `macos-14` (Xcode 15.4) to `macos-15`
+  (Xcode 16) to keep the build toolchain current.
+- `swift-tools-version` bumped from 5.9 to 5.10.
+- `build-app.sh` now derives `CFBundleShortVersionString` and `CFBundleVersion`
+  automatically from the latest git tag instead of a hardcoded `1.0`.
+- `User-Agent` header updated to reflect the current version.
+
+### Added
+- Dependabot configuration (`.github/dependabot.yml`) for weekly automated
+  updates of GitHub Actions and Swift package dependencies.
+
 ## [0.2.0] - 2026-04-30
 
 ### Added
@@ -25,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ad-hoc signed `.app` bundle via `build-app.sh`.
 - GitHub Actions for CI and release builds.
 
-[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/thomashahn623/ClaudeUsage/releases/tag/v0.1.0
