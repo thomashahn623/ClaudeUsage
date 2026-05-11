@@ -7,6 +7,9 @@ cd "$(dirname "$0")"
 CONFIG="${CONFIG:-release}"
 APP_NAME="ClaudeStatus"
 APP_DIR="build/${APP_NAME}.app"
+# Strip leading 'v' from tag (e.g. v0.3.0 → 0.3.0); fall back to "dev"
+RAW_VERSION="${APP_VERSION:-dev}"
+BUNDLE_VERSION="${RAW_VERSION#v}"
 
 echo "→ swift build -c ${CONFIG}"
 swift build -c "${CONFIG}"
@@ -36,9 +39,9 @@ cat > "${APP_DIR}/Contents/Info.plist" <<PLIST
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>${BUNDLE_VERSION}</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>${BUNDLE_VERSION}</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>LSUIElement</key>
