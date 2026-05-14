@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-05-09
+## [0.3.0] - 2026-05-14
 
 ### Changed
 - CI and release workflows migrated from `macos-14` (Xcode 15.4) to `macos-15`
@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `build-app.sh` now derives `CFBundleShortVersionString` and `CFBundleVersion`
   automatically from the latest git tag instead of a hardcoded `1.0`.
 - `User-Agent` header updated to reflect the current version.
+- Bump `actions/checkout` from 4 to 6.
+- Bump `actions/upload-artifact` from 4 to 7.
+- Bump `softprops/action-gh-release` from 2 to 3.
 
 ### Added
 - Dependabot configuration (`.github/dependabot.yml`) for weekly automated
