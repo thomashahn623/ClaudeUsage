@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-05-14
+
+### Changed
+- Forecast velocity window now scales per metric: the 5-hour session keeps
+  the 30-minute regression window, while the 7-day and 7-day Opus metrics
+  use a 6-hour window. Extrapolating a 30-minute burst across five-plus
+  days produced misleading "200 % at reset" warnings; the longer window
+  averages out short bursts and idle gaps for the long cycle.
+- The popover's forecast line is no longer coloured solely by the projected
+  utilisation. A sanity gate now requires both an *over-budget* burn rate
+  (`utilization > elapsed cycle time`) and a projection of `>= 100 %` before
+  the line turns red. Low-confidence forecasts remain greyed out as before.
+- The menu bar icon now reflects actual overrun risk via a new
+  `menuBarColor`: red when any metric is critical (over budget *and*
+  projected to overflow, or already at 100 %), yellow when any metric is
+  over budget, green otherwise. The previous logic only watched the 5-hour
+  utilisation and flipped to red at 85 %, which fired even when the time
+  window had plenty of headroom left.
+
 ## [0.5.0] - 2026-05-14
 
 ### Added

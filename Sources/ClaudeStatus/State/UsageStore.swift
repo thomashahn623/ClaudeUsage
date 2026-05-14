@@ -112,6 +112,49 @@ extension UsageStore {
         return min(max(elapsed / windowDuration, 0), 1)
     }
 
+    static func cycleWindow(for metric: MetricKind) -> TimeInterval {
+        switch metric {
+        case .fiveHour: return 5 * 3600
+        case .sevenDay, .sevenDayOpus: return 7 * 24 * 3600
+        }
+    }
+
+    private func usageMetric(for metric: MetricKind) -> UsageMetric? {
+        guard let snap = snapshot else { return nil }
+        switch metric {
+        case .fiveHour: return snap.fiveHour
+        case .sevenDay: return snap.sevenDay
+        case .sevenDayOpus: return snap.sevenDayOpus
+        }
+    }
+
+    func timeProgress(for metric: MetricKind, now: Date = Date()) -> Double? {
+        guard let m = usageMetric(for: metric) else { return nil }
+        return Self.timeProgress(for: m, windowDuration: Self.cycleWindow(for: metric), now: now)
+    }
+
+    func isOverBudget(for metric: MetricKind, now: Date = Date()) -> Bool {
+        guard let m = usageMetric(for: metric),
+              let t = timeProgress(for: metric, now: now) else { return false }
+        return m.utilization > t * 100
+    }
+
+    func isCritical(for metric: MetricKind, now: Date = Date()) -> Bool {
+        guard let m = usageMetric(for: metric) else { return false }
+        if m.utilization >= 100 { return true }
+        guard isOverBudget(for: metric, now: now),
+              let f = forecast(for: metric, now: now),
+              f.confidence != .low else { return false }
+        return f.projectedAtReset >= 100
+    }
+
+    var menuBarColor: Color {
+        let metrics: [MetricKind] = [.fiveHour, .sevenDay, .sevenDayOpus]
+        if metrics.contains(where: { isCritical(for: $0) }) { return .red }
+        if metrics.contains(where: { isOverBudget(for: $0) }) { return .yellow }
+        return .green
+    }
+
     func menuBarText(for mode: MenuBarDisplayMode, now: Date = Date()) -> String? {
         guard let snap = snapshot else { return nil }
 

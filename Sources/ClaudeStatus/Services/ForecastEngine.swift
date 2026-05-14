@@ -10,11 +10,19 @@ struct ForecastResult: Equatable {
 }
 
 enum ForecastEngine {
+    static func defaultWindowDuration(for metric: MetricKind) -> TimeInterval {
+        switch metric {
+        case .fiveHour: return 30 * 60
+        case .sevenDay, .sevenDayOpus: return 6 * 3600
+        }
+    }
+
     static func compute(samples: [HistorySample],
                         metric: MetricKind,
                         currentMetric: UsageMetric,
-                        windowDuration: TimeInterval = 30 * 60,
+                        windowDuration: TimeInterval? = nil,
                         now: Date = Date()) -> ForecastResult? {
+        let windowDuration = windowDuration ?? defaultWindowDuration(for: metric)
         guard let resetsAt = currentMetric.resetsAt, resetsAt > now else { return nil }
 
         let cycleSamples = samples

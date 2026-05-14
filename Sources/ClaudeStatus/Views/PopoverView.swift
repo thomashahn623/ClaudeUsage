@@ -27,18 +27,21 @@ struct PopoverView: View {
                           metric: snap.fiveHour,
                           windowDuration: 5 * 3600,
                           color: store.trafficColor,
-                          forecast: store.forecast(for: .fiveHour, now: now))
+                          forecast: store.forecast(for: .fiveHour, now: now),
+                          isCritical: store.isCritical(for: .fiveHour, now: now))
                 metricRow(title: "7-Tage-Limit",
                           metric: snap.sevenDay,
                           windowDuration: 7 * 24 * 3600,
                           color: .blue,
-                          forecast: store.forecast(for: .sevenDay, now: now))
+                          forecast: store.forecast(for: .sevenDay, now: now),
+                          isCritical: store.isCritical(for: .sevenDay, now: now))
                 if let opus = snap.sevenDayOpus, opus.utilization > 0 {
                     metricRow(title: "7-Tage-Opus",
                               metric: opus,
                               windowDuration: 7 * 24 * 3600,
                               color: .purple,
-                              forecast: store.forecast(for: .sevenDayOpus, now: now))
+                              forecast: store.forecast(for: .sevenDayOpus, now: now),
+                              isCritical: store.isCritical(for: .sevenDayOpus, now: now))
                 }
 
                 Text("Aktualisiert: \(snap.fetchedAt.formatted(date: .omitted, time: .shortened))")
@@ -80,7 +83,7 @@ struct PopoverView: View {
     }
 
     @ViewBuilder
-    private func metricRow(title: String, metric: UsageMetric, windowDuration: TimeInterval, color: Color, forecast: ForecastResult?) -> some View {
+    private func metricRow(title: String, metric: UsageMetric, windowDuration: TimeInterval, color: Color, forecast: ForecastResult?, isCritical: Bool) -> some View {
         let timeProgress = timeProgress(for: metric, windowDuration: windowDuration)
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -112,13 +115,13 @@ struct PopoverView: View {
                     .foregroundStyle(.secondary)
             }
             if let forecast {
-                forecastLine(forecast)
+                forecastLine(forecast, isCritical: isCritical)
             }
         }
     }
 
     @ViewBuilder
-    private func forecastLine(_ forecast: ForecastResult) -> some View {
+    private func forecastLine(_ forecast: ForecastResult, isCritical: Bool) -> some View {
         let arrow: String = {
             if forecast.velocityPerHour > 1 { return "arrow.up.right" }
             if forecast.velocityPerHour < -1 { return "arrow.down.right" }
@@ -132,8 +135,7 @@ struct PopoverView: View {
         let suffix = forecast.confidence == .low ? " · wenig Daten" : ""
         let color: Color = {
             if forecast.confidence == .low { return .secondary }
-            if forecast.projectedAtReset >= 100 { return .red }
-            if forecast.projectedAtReset >= 85 { return .orange }
+            if isCritical { return .red }
             return .secondary
         }()
         HStack(spacing: 4) {
