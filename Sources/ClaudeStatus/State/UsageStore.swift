@@ -75,10 +75,51 @@ extension UsageStore {
     var fiveHourPercent: Int {
         Int((snapshot?.fiveHour.utilization ?? 0).rounded())
     }
+    var sevenDayPercent: Int {
+        Int((snapshot?.sevenDay.utilization ?? 0).rounded())
+    }
     var trafficColor: Color {
         let p = fiveHourPercent
         if p >= 85 { return .red }
         if p >= 60 { return .yellow }
         return .green
+    }
+
+    static func timeProgress(for metric: UsageMetric, windowDuration: TimeInterval, now: Date = Date()) -> Double? {
+        guard let reset = metric.resetsAt, windowDuration > 0 else { return nil }
+        let start = reset.addingTimeInterval(-windowDuration)
+        let elapsed = now.timeIntervalSince(start)
+        return min(max(elapsed / windowDuration, 0), 1)
+    }
+
+    func menuBarText(for mode: MenuBarDisplayMode, now: Date = Date()) -> String? {
+        guard let snap = snapshot else { return nil }
+
+        let fiveUsage = Int(snap.fiveHour.utilization.rounded())
+        let weekUsage = Int(snap.sevenDay.utilization.rounded())
+        let fiveTime = Self.timeProgress(for: snap.fiveHour, windowDuration: 5 * 3600, now: now)
+            .map { Int(($0 * 100).rounded()) }
+        let weekTime = Self.timeProgress(for: snap.sevenDay, windowDuration: 7 * 24 * 3600, now: now)
+            .map { Int(($0 * 100).rounded()) }
+
+        func combine(_ usage: Int, _ time: Int?) -> String {
+            if let time { return "\(usage)%/\(time)%" }
+            return "\(usage)%"
+        }
+
+        switch mode {
+        case .fiveHourUsage:
+            return "\(fiveUsage)%"
+        case .fiveHourUsageAndTime:
+            return combine(fiveUsage, fiveTime)
+        case .weeklyUsage:
+            return "\(weekUsage)%"
+        case .weeklyUsageAndTime:
+            return combine(weekUsage, weekTime)
+        case .bothUsage:
+            return "\(fiveUsage)% | \(weekUsage)%"
+        case .bothUsageAndTime:
+            return "\(combine(fiveUsage, fiveTime)) | \(combine(weekUsage, weekTime))"
+        }
     }
 }
