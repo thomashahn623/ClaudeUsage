@@ -10,6 +10,8 @@ A native macOS menu bar app that shows your current Claude.ai subscription usage
 - 📅 7-day weekly limit
 - 🧠 7-day Opus limit (only shown when used)
 - ⏳ Reset countdown for each limit
+- 📈 Forecast & velocity: projected utilisation at reset, based on a regression over the last 30 minutes
+- 🗂️ Local history of every snapshot, with a "Verlauf" window listing past cycles per metric
 
 ## ✨ Features
 
@@ -19,6 +21,7 @@ A native macOS menu bar app that shows your current Claude.ai subscription usage
 - 🚦 Traffic-light icon: green < 60%, yellow < 85%, red ≥ 85%
 - 🔄 Refreshes every 60 seconds
 - 🎛️ Six menu bar display modes — usage only or usage paired with elapsed-time progress, for the 5h window, the weekly window, or both
+- 💾 Snapshots persisted locally to `~/Library/Application Support/ClaudeStatus/history.json`
 
 ## 📋 Requirements
 
@@ -80,7 +83,7 @@ Until a dedicated settings toggle exists: in `System Settings → General → Lo
 
 - ❌ No EUR cost estimation (the data source does not return token counts, any estimate would be too unreliable)
 - ❌ No access to Claude Code CLI data or the Anthropic Console
-- ❌ No history, no charts, no push notifications
+- ❌ No charts (yet) or push notifications
 
 ## ⚠️ Notes
 
@@ -95,17 +98,22 @@ ClaudeStatus/
 ├── Package.swift
 ├── build-app.sh                  # builds .app bundle with LSUIElement
 └── Sources/ClaudeStatus/
-    ├── ClaudeStatusApp.swift     # @main, MenuBarExtra
-    ├── Models/UsageSnapshot.swift
+    ├── ClaudeStatusApp.swift     # @main, MenuBarExtra + windows
+    ├── Models/
+    │   ├── UsageSnapshot.swift
+    │   └── HistorySample.swift   # persisted history entry + cycle summary
     ├── Services/
-    │   ├── ClaudeAPIClient.swift # URLSession wrapper
-    │   └── KeychainStore.swift   # cookie & org id in Keychain
+    │   ├── ClaudeAPIClient.swift      # URLSession wrapper
+    │   ├── KeychainStore.swift        # cookie & org id in Keychain (cached)
+    │   ├── HistoryStore.swift         # JSON-persisted snapshot history
+    │   └── ForecastEngine.swift       # linear regression over recent samples
     ├── State/
     │   ├── UsageStore.swift           # ObservableObject, 60s polling
     │   └── MenuBarDisplayMode.swift   # enum for the menu bar display picker
     └── Views/
         ├── PopoverView.swift
-        └── SettingsView.swift
+        ├── SettingsView.swift
+        └── HistorySheetView.swift
 ```
 
 ## 📜 License

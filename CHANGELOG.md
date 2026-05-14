@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-14
+
+### Added
+- Local usage history is now persisted to
+  `~/Library/Application Support/ClaudeStatus/history.json`. Every successful
+  60-second snapshot is appended, with debounced writes to keep IO low.
+- Forecast line below each usage bar in the popover, showing the projected
+  utilisation at reset and the current velocity in `% / hour`. Uses linear
+  regression over the last 30 minutes (with fallback to the entire current
+  cycle when fewer than three samples are available). Confidence is shown
+  through colour: secondary for low-confidence, orange when the forecast
+  crosses 85 %, red at 100 %.
+- New "Verlauf" window (opened from the popover) lists past cycles per
+  metric (5h / 7d / Opus) with peak utilisation, average velocity and
+  sample range.
+
+### Changed
+- `KeychainStore` now caches values in memory after the first read, so each
+  app session triggers at most one Keychain prompt per stored item instead
+  of one per refresh.
+- `build-app.sh` automatically picks the most stable code-signing identity
+  available (Developer ID > Apple Development > Apple Distribution > local
+  self-signed cert) and falls back to ad-hoc when none is found. CI runs
+  (`CI=true`, e.g. GitHub Actions) always force ad-hoc, so released `.app`
+  bundles contain no personal Apple ID, team ID or signer name. Override
+  via `SIGN_IDENTITY=...` or `FORCE_AD_HOC=1`.
+
 ## [0.4.0] - 2026-05-14
 
 ### Added
@@ -51,7 +78,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ad-hoc signed `.app` bundle via `build-app.sh`.
 - GitHub Actions for CI and release builds.
 
-[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.1.0...v0.2.0
