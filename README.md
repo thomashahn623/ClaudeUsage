@@ -18,6 +18,7 @@ A native macOS menu bar app that shows your current Claude.ai subscription usage
 - 🔒 `sessionKey` stored securely in the macOS Keychain
 - 🚦 Traffic-light icon: green < 60%, yellow < 85%, red ≥ 85%
 - 🔄 Refreshes every 60 seconds
+- 🎛️ Six menu bar display modes — usage only or usage paired with elapsed-time progress, for the 5h window, the weekly window, or both
 
 ## 📋 Requirements
 
@@ -56,6 +57,21 @@ How to get the `sessionKey`:
 
 The cookie is stored in the macOS Keychain. It typically lives for a few weeks. When the icon shows a warning triangle ⚠️, it expired — repeat the steps above.
 
+## 🎛️ Menu bar display modes
+
+Open **Settings → Menüleisten-Anzeige** to pick what the menu bar shows. `x` is token usage, `y` is the elapsed-time progress within the same window.
+
+| Mode | Example |
+|---|---|
+| 5h: x% _(default)_ | `45%` |
+| 5h: x%/y% | `45%/67%` |
+| Woche: x% | `30%` |
+| Woche: x%/y% | `30%/12%` |
+| 5h + Woche (x% \| x%) | `45% \| 30%` |
+| 5h + Woche (x%/y% \| x%/y%) | `45%/67% \| 30%/12%` |
+
+The choice is persisted across restarts.
+
 ## 🌅 Autostart at login
 
 Until a dedicated settings toggle exists: in `System Settings → General → Login Items → +` add `ClaudeStatus.app`.
@@ -84,7 +100,9 @@ ClaudeStatus/
     ├── Services/
     │   ├── ClaudeAPIClient.swift # URLSession wrapper
     │   └── KeychainStore.swift   # cookie & org id in Keychain
-    ├── State/UsageStore.swift    # ObservableObject, 60s polling
+    ├── State/
+    │   ├── UsageStore.swift           # ObservableObject, 60s polling
+    │   └── MenuBarDisplayMode.swift   # enum for the menu bar display picker
     └── Views/
         ├── PopoverView.swift
         └── SettingsView.swift
