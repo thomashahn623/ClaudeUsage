@@ -26,6 +26,12 @@ struct ClaudeStatusApp: App {
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 460, height: 320)
+
+        Window("ClaudeStatus Verlauf", id: "history") {
+            HistorySheetView().environmentObject(store)
+        }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 460, height: 420)
     }
 
     private var iconName: String {

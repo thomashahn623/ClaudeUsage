@@ -26,16 +26,19 @@ struct PopoverView: View {
                 metricRow(title: "5-Stunden-Session",
                           metric: snap.fiveHour,
                           windowDuration: 5 * 3600,
-                          color: store.trafficColor)
+                          color: store.trafficColor,
+                          forecast: store.forecast(for: .fiveHour, now: now))
                 metricRow(title: "7-Tage-Limit",
                           metric: snap.sevenDay,
                           windowDuration: 7 * 24 * 3600,
-                          color: .blue)
+                          color: .blue,
+                          forecast: store.forecast(for: .sevenDay, now: now))
                 if let opus = snap.sevenDayOpus, opus.utilization > 0 {
                     metricRow(title: "7-Tage-Opus",
                               metric: opus,
                               windowDuration: 7 * 24 * 3600,
-                              color: .purple)
+                              color: .purple,
+                              forecast: store.forecast(for: .sevenDayOpus, now: now))
                 }
 
                 Text("Aktualisiert: \(snap.fetchedAt.formatted(date: .omitted, time: .shortened))")
@@ -55,6 +58,12 @@ struct PopoverView: View {
                 }
                 Button {
                     NSApp.activate(ignoringOtherApps: true)
+                    openWindow(id: "history")
+                } label: {
+                    Label("Verlauf", systemImage: "chart.xyaxis.line")
+                }
+                Button {
+                    NSApp.activate(ignoringOtherApps: true)
                     openWindow(id: "settings")
                 } label: {
                     Label("Einstellungen", systemImage: "gearshape")
@@ -71,7 +80,7 @@ struct PopoverView: View {
     }
 
     @ViewBuilder
-    private func metricRow(title: String, metric: UsageMetric, windowDuration: TimeInterval, color: Color) -> some View {
+    private func metricRow(title: String, metric: UsageMetric, windowDuration: TimeInterval, color: Color, forecast: ForecastResult?) -> some View {
         let timeProgress = timeProgress(for: metric, windowDuration: windowDuration)
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -102,7 +111,38 @@ struct PopoverView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
             }
+            if let forecast {
+                forecastLine(forecast)
+            }
         }
+    }
+
+    @ViewBuilder
+    private func forecastLine(_ forecast: ForecastResult) -> some View {
+        let arrow: String = {
+            if forecast.velocityPerHour > 1 { return "arrow.up.right" }
+            if forecast.velocityPerHour < -1 { return "arrow.down.right" }
+            return "arrow.right"
+        }()
+        let projected = Int(forecast.projectedAtReset.rounded())
+        let velocityText: String = {
+            let sign = forecast.velocityPerHour >= 0 ? "+" : ""
+            return "\(sign)\(String(format: "%.0f", forecast.velocityPerHour)) %/h"
+        }()
+        let suffix = forecast.confidence == .low ? " · wenig Daten" : ""
+        let color: Color = {
+            if forecast.confidence == .low { return .secondary }
+            if forecast.projectedAtReset >= 100 { return .red }
+            if forecast.projectedAtReset >= 85 { return .orange }
+            return .secondary
+        }()
+        HStack(spacing: 4) {
+            Image(systemName: arrow)
+            Text("Forecast: \(projected) % bei Reset · \(velocityText)\(suffix)")
+                .monospacedDigit()
+        }
+        .font(.caption2)
+        .foregroundStyle(color)
     }
 
     private func timeProgress(for metric: UsageMetric, windowDuration: TimeInterval) -> Double? {

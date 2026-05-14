@@ -10,6 +10,8 @@ final class UsageStore: ObservableObject {
     @Published var orgId: String? = KeychainStore.get(.orgId)
     @Published var hasCookie: Bool = (KeychainStore.get(.sessionKey)?.isEmpty == false)
 
+    let history = HistoryStore()
+
     private let client = ClaudeAPIClient()
     private var timer: Timer?
     private let interval: TimeInterval = 60
@@ -62,6 +64,7 @@ final class UsageStore: ObservableObject {
             guard let id = orgId else { return }
             let snap = try await client.fetchUsage(orgId: id)
             self.snapshot = snap
+            self.history.append(snap)
             self.lastError = nil
         } catch let err as ClaudeAPIError {
             self.lastError = err.errorDescription
@@ -77,6 +80,23 @@ extension UsageStore {
     }
     var sevenDayPercent: Int {
         Int((snapshot?.sevenDay.utilization ?? 0).rounded())
+    }
+
+    func forecast(for metric: MetricKind, now: Date = Date()) -> ForecastResult? {
+        guard let snap = snapshot else { return nil }
+        let usageMetric: UsageMetric?
+        switch metric {
+        case .fiveHour: usageMetric = snap.fiveHour
+        case .sevenDay: usageMetric = snap.sevenDay
+        case .sevenDayOpus: usageMetric = snap.sevenDayOpus
+        }
+        guard let current = usageMetric else { return nil }
+        return ForecastEngine.compute(
+            samples: history.samples,
+            metric: metric,
+            currentMetric: current,
+            now: now
+        )
     }
     var trafficColor: Color {
         let p = fiveHourPercent
