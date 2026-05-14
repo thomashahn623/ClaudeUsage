@@ -11,5 +11,5 @@ jobs:
     name: Swift build
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - run: swift build -c release
