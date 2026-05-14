@@ -8,6 +8,10 @@ CONFIG="${CONFIG:-release}"
 APP_NAME="ClaudeStatus"
 APP_DIR="build/${APP_NAME}.app"
 
+# Version aus dem nächsten git-Tag ableiten (z. B. v0.3.0 → 0.3.0)
+VERSION=$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "0.0.0")
+BUILD=$(git rev-list --count HEAD 2>/dev/null || echo "1")
+
 echo "→ swift build -c ${CONFIG}"
 swift build -c "${CONFIG}"
 
@@ -36,9 +40,9 @@ cat > "${APP_DIR}/Contents/Info.plist" <<PLIST
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0</string>
+    <string>${VERSION}</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>${BUILD}</string>
     <key>LSMinimumSystemVersion</key>
     <string>14.0</string>
     <key>LSUIElement</key>
@@ -53,6 +57,6 @@ echo "→ Ad-hoc-Signatur"
 codesign --force --deep --sign - "${APP_DIR}"
 
 echo
-echo "Fertig: ${APP_DIR}"
+echo "Fertig: ${APP_DIR}  (Version ${VERSION}, Build ${BUILD})"
 echo "Starten:  open ${APP_DIR}"
 echo "In den Programme-Ordner verschieben:  mv ${APP_DIR} /Applications/"
