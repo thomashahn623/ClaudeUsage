@@ -12,7 +12,7 @@ struct ClaudeStatusApp: App {
         } label: {
             HStack(spacing: 4) {
                 Image(systemName: iconName)
-                    .foregroundStyle(store.trafficColor)
+                    .foregroundStyle(store.menuBarColor)
                 if let text = store.menuBarText(for: MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage) {
                     Text(text)
                         .monospacedDigit()
