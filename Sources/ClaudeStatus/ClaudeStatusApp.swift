@@ -4,6 +4,7 @@ import AppKit
 @main
 struct ClaudeStatusApp: App {
     @StateObject private var store = UsageStore()
+    @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
 
     var body: some Scene {
         MenuBarExtra {
@@ -12,8 +13,8 @@ struct ClaudeStatusApp: App {
             HStack(spacing: 4) {
                 Image(systemName: iconName)
                     .foregroundStyle(store.trafficColor)
-                if store.snapshot != nil {
-                    Text("\(store.fiveHourPercent)%")
+                if let text = store.menuBarText(for: MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage) {
+                    Text(text)
                         .monospacedDigit()
                 }
             }

@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var store: UsageStore
     @Environment(\.dismiss) private var dismiss
     @State private var sessionKey: String = KeychainStore.get(.sessionKey) ?? ""
+    @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -26,6 +27,17 @@ struct SettingsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
+
+            Divider()
+
+            Text("Menüleisten-Anzeige").font(.subheadline)
+            Picker("Anzeige in der Menüleiste", selection: $displayModeRaw) {
+                ForEach(MenuBarDisplayMode.allCases) { mode in
+                    Text(mode.localizedTitle).tag(mode.rawValue)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
 
             HStack {
                 Spacer()
