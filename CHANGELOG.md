@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-05-21
+
+### Changed
+- 7-day and 7-day Opus forecasts now exclude a fixed 00:00–08:00 sleep
+  window from the remaining hours used in the projection. The
+  short-window velocity is computed from awake samples but was previously
+  multiplied by the full wall-clock interval to reset, which over-projected
+  by ~8 hours per remaining day for the weekly limit. The 5-hour session
+  forecast is unchanged.
+
 ## [0.5.1] - 2026-05-14
 
 ### Changed
@@ -97,7 +107,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ad-hoc signed `.app` bundle via `build-app.sh`.
 - GitHub Actions for CI and release builds.
 
-[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.2.0...v0.3.0

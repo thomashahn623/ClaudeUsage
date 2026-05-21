@@ -21,6 +21,7 @@ enum ForecastEngine {
                         metric: MetricKind,
                         currentMetric: UsageMetric,
                         windowDuration: TimeInterval? = nil,
+                        excludeSleepHours: Bool = false,
                         now: Date = Date()) -> ForecastResult? {
         let windowDuration = windowDuration ?? defaultWindowDuration(for: metric)
         guard let resetsAt = currentMetric.resetsAt, resetsAt > now else { return nil }
@@ -48,8 +49,15 @@ enum ForecastEngine {
             return nil
         }
 
-        let hoursToReset = resetsAt.timeIntervalSince(now) / 3600
-        let projected = currentMetric.utilization + velocity * hoursToReset
+        let wallHoursToReset = resetsAt.timeIntervalSince(now) / 3600
+        let effectiveHours: Double
+        if excludeSleepHours {
+            let sleep = sleepHours(from: now, to: resetsAt)
+            effectiveHours = max(wallHoursToReset - sleep, 0)
+        } else {
+            effectiveHours = wallHoursToReset
+        }
+        let projected = currentMetric.utilization + velocity * effectiveHours
         let clamped = min(max(projected, 0), 200)
 
         let confidence: ForecastResult.Confidence
@@ -82,5 +90,31 @@ enum ForecastEngine {
         guard denominator != 0 else { return nil }
 
         return (n * sumXY - sumX * sumY) / denominator
+    }
+
+    private static func sleepHours(from start: Date, to end: Date,
+                                   sleepStartHour: Int = 0, sleepEndHour: Int = 8) -> Double {
+        guard end > start, sleepEndHour > sleepStartHour else { return 0 }
+        let calendar = Calendar.current
+        var total: TimeInterval = 0
+        var dayCursor = calendar.startOfDay(for: start)
+
+        while dayCursor < end {
+            guard
+                let sleepBegin = calendar.date(bySettingHour: sleepStartHour, minute: 0, second: 0, of: dayCursor),
+                let sleepEnd = calendar.date(bySettingHour: sleepEndHour, minute: 0, second: 0, of: dayCursor)
+            else { break }
+
+            let overlapStart = max(sleepBegin, start)
+            let overlapEnd = min(sleepEnd, end)
+            if overlapEnd > overlapStart {
+                total += overlapEnd.timeIntervalSince(overlapStart)
+            }
+
+            guard let next = calendar.date(byAdding: .day, value: 1, to: dayCursor) else { break }
+            dayCursor = next
+        }
+
+        return total / 3600
     }
 }

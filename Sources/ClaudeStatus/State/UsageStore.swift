@@ -91,10 +91,16 @@ extension UsageStore {
         case .sevenDayOpus: usageMetric = snap.sevenDayOpus
         }
         guard let current = usageMetric else { return nil }
+        let excludeSleep: Bool
+        switch metric {
+        case .fiveHour: excludeSleep = false
+        case .sevenDay, .sevenDayOpus: excludeSleep = true
+        }
         return ForecastEngine.compute(
             samples: history.samples,
             metric: metric,
             currentMetric: current,
+            excludeSleepHours: excludeSleep,
             now: now
         )
     }
