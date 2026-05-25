@@ -3,8 +3,10 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var store: UsageStore
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openWindow) private var openWindow
     @State private var sessionKey: String = KeychainStore.get(.sessionKey) ?? ""
     @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
+    @AppStorage("onboardingCompleted") private var onboardingCompleted: Bool = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -23,6 +25,13 @@ struct SettingsView: View {
                     Text("3. Tab Application → Cookies → https://claude.ai.")
                     Text("4. Eintrag sessionKey markieren, Value kopieren.")
                     Text("5. Hier einfügen und speichern.")
+                    Button("Geführtes Onboarding erneut öffnen") {
+                        onboardingCompleted = false
+                        NSApp.activate(ignoringOtherApps: true)
+                        openWindow(id: "onboarding")
+                    }
+                    .buttonStyle(.link)
+                    .padding(.top, 4)
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)

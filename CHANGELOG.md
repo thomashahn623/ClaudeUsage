@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-05-25
+
+### Added
+- Geführtes Onboarding beim ersten Start: ein vierstufiger Assistent
+  erklärt, wie der `sessionKey`-Cookie aus claude.ai (Browser-DevTools →
+  Application → Cookies) kopiert wird, öffnet auf Wunsch direkt
+  claude.ai und nimmt den Key am Ende entgegen. Wird automatisch
+  gezeigt, solange kein Key hinterlegt und `onboardingCompleted` noch
+  nicht gesetzt ist; lässt sich aus den Einstellungen heraus erneut
+  öffnen.
+
 ## [0.5.3] - 2026-05-25
 
 ### Fixed

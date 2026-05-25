@@ -5,19 +5,15 @@ import AppKit
 struct ClaudeStatusApp: App {
     @StateObject private var store = UsageStore()
     @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
+    @AppStorage("onboardingCompleted") private var onboardingCompleted: Bool = false
 
     var body: some Scene {
         MenuBarExtra {
             PopoverView().environmentObject(store)
         } label: {
-            HStack(spacing: 4) {
-                Image(systemName: iconName)
-                    .foregroundStyle(store.menuBarColor)
-                if let text = store.menuBarText(for: MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage) {
-                    Text(text)
-                        .monospacedDigit()
-                }
-            }
+            MenuBarLabel(store: store,
+                         displayModeRaw: displayModeRaw,
+                         shouldShowOnboarding: !onboardingCompleted && !store.hasCookie)
         }
         .menuBarExtraStyle(.window)
 
@@ -32,6 +28,40 @@ struct ClaudeStatusApp: App {
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 460, height: 420)
+
+        Window("Willkommen bei ClaudeStatus", id: "onboarding") {
+            OnboardingView().environmentObject(store)
+        }
+        .windowResizability(.contentSize)
+        .defaultSize(width: 540, height: 460)
+    }
+}
+
+private struct MenuBarLabel: View {
+    @ObservedObject var store: UsageStore
+    let displayModeRaw: String
+    let shouldShowOnboarding: Bool
+
+    @Environment(\.openWindow) private var openWindow
+    @State private var didTriggerOnboarding = false
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: iconName)
+                .foregroundStyle(store.menuBarColor)
+            if let text = store.menuBarText(for: MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage) {
+                Text(text)
+                    .monospacedDigit()
+            }
+        }
+        .onAppear {
+            guard !didTriggerOnboarding, shouldShowOnboarding else { return }
+            didTriggerOnboarding = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                NSApp.activate(ignoringOtherApps: true)
+                openWindow(id: "onboarding")
+            }
+        }
     }
 
     private var iconName: String {
