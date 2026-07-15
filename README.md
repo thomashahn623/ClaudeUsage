@@ -63,11 +63,12 @@ The cookie is stored in the macOS Keychain. It typically lives for a few weeks. 
 
 ## 🤖 Enable Codex usage
 
-Open **Settings** and paste the complete ChatGPT cookie string for `chatgpt.com`
-into **Codex / ChatGPT-Sitzungs-Cookie** (for example
-`__Secure-next-auth.session-token=…`). The app reads the same two rate-limit
-windows shown in Codex's Usage dashboard and stores this value separately in the
-macOS Keychain. This endpoint is unofficial and may change.
+Open **Settings** and copy the values (not the cookie names) for
+`__Secure-next-auth.session-token.0` and
+`__Secure-next-auth.session-token.1` from the `chatgpt.com` cookie storage into
+the two **Codex / ChatGPT-Sitzungs-Cookie** fields. The app assembles the header
+and stores both values separately in the macOS Keychain. This endpoint is
+unofficial and may change.
 
 ## 🎛️ Menu bar display modes
 

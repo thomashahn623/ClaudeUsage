@@ -189,6 +189,10 @@ extension UsageStore {
             return "\(fiveUsage)% | \(weekUsage)%"
         case .bothUsageAndTime:
             return "\(combine(fiveUsage, fiveTime)) | \(combine(weekUsage, weekTime))"
+        case .codexPrimaryUsage, .codexPrimaryUsageAndTime, .codexBothUsage, .codexBothUsageAndTime:
+            return nil
+        case .claudeAndCodexUsage, .claudeAndCodexUsageAndTime:
+            return nil
         }
     }
 }

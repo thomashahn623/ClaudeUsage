@@ -6,7 +6,9 @@ struct SettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
     @State private var sessionKey: String = KeychainStore.get(.sessionKey) ?? ""
-    @State private var codexSessionCookie: String = KeychainStore.get(.codexSessionCookie) ?? ""
+    @State private var codexSessionCookiePart0: String = KeychainStore.get(.codexSessionCookiePart0) ?? ""
+    @State private var codexSessionCookiePart1: String = KeychainStore.get(.codexSessionCookiePart1) ?? ""
+    @State private var codexIdentityCookie: String = KeychainStore.get(.codexIdentityCookie) ?? ""
     @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
     @AppStorage("onboardingCompleted") private var onboardingCompleted: Bool = false
 
@@ -43,9 +45,13 @@ struct SettingsView: View {
 
             Text("Codex / ChatGPT-Sitzungs-Cookie")
                 .font(.subheadline)
-            SecureField("__Secure-next-auth.session-token=…", text: $codexSessionCookie)
+            SecureField("session-token.0: nur der Wert", text: $codexSessionCookiePart0)
                 .textFieldStyle(.roundedBorder)
-            Text("In ChatGPT DevTools unter Application → Cookies für chatgpt.com den vollständigen Cookie-Eintrag einfügen. Er wird nur lokal im Schlüsselbund gespeichert.")
+            SecureField("session-token.1: nur der Wert", text: $codexSessionCookiePart1)
+                .textFieldStyle(.roundedBorder)
+            SecureField("oai-is: nur der Wert", text: $codexIdentityCookie)
+                .textFieldStyle(.roundedBorder)
+            Text("In Safari Web Inspector → Speicher → Cookies für chatgpt.com die Werte von __Secure-next-auth.session-token.0, .1 und __Secure-oai-is einfügen. Alle Werte werden nur lokal im Schlüsselbund gespeichert.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
@@ -66,7 +72,7 @@ struct SettingsView: View {
                 Button("Speichern") {
                     Task {
                         await store.setSessionKey(sessionKey)
-                        await codexStore.setSessionCookie(codexSessionCookie)
+                        await codexStore.setSessionCookieParts(codexSessionCookiePart0, codexSessionCookiePart1, codexIdentityCookie)
                         dismiss()
                     }
                 }

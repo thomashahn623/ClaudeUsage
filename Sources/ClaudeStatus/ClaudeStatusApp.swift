@@ -15,6 +15,7 @@ struct ClaudeStatusApp: App {
                 .environmentObject(codexStore)
         } label: {
             MenuBarLabel(store: store,
+                         codexStore: codexStore,
                          displayModeRaw: displayModeRaw,
                          shouldShowOnboarding: !onboardingCompleted && !store.hasCookie)
         }
@@ -44,6 +45,7 @@ struct ClaudeStatusApp: App {
 
 private struct MenuBarLabel: View {
     @ObservedObject var store: UsageStore
+    @ObservedObject var codexStore: CodexUsageStore
     let displayModeRaw: String
     let shouldShowOnboarding: Bool
 
@@ -51,10 +53,11 @@ private struct MenuBarLabel: View {
     @State private var didTriggerOnboarding = false
 
     var body: some View {
+        let mode = MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage
         HStack(spacing: 4) {
             Image(systemName: iconName)
-                .foregroundStyle(store.menuBarColor)
-            if let text = store.menuBarText(for: MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage) {
+                .foregroundStyle(menuBarColor(for: mode))
+            if let text = menuBarText(for: mode) {
                 Text(text)
                     .monospacedDigit()
             }
@@ -70,8 +73,54 @@ private struct MenuBarLabel: View {
     }
 
     private var iconName: String {
+        let mode = MenuBarDisplayMode(rawValue: displayModeRaw) ?? .fiveHourUsage
+        if mode.showsCodex {
+            guard codexStore.hasCookie else { return "key.slash" }
+            if codexStore.lastError != nil { return "exclamationmark.triangle" }
+            return "chart.bar.fill"
+        }
         guard store.hasCookie else { return "key.slash" }
         if store.lastError != nil { return "exclamationmark.triangle" }
         return "chart.bar.fill"
+    }
+
+    private func menuBarText(for mode: MenuBarDisplayMode) -> String? {
+        if mode.showsClaudeAndCodex {
+            return combinedProviderText(withTime: mode == .claudeAndCodexUsageAndTime)
+        }
+        return mode.showsCodex ? codexStore.menuBarText(for: mode) : store.menuBarText(for: mode)
+    }
+
+    private func menuBarColor(for mode: MenuBarDisplayMode) -> Color {
+        if mode.showsClaudeAndCodex {
+            let codexUsage = codexStore.snapshot?.primary.utilization ?? 0
+            if codexUsage >= 100 { return .red }
+            if codexUsage >= 85 { return .yellow }
+            return store.menuBarColor
+        }
+        guard mode.showsCodex else { return store.menuBarColor }
+        guard let usage = codexStore.snapshot?.primary.utilization else { return .secondary }
+        if usage >= 100 { return .red }
+        if usage >= 85 { return .yellow }
+        return .green
+    }
+
+    private func combinedProviderText(withTime: Bool) -> String? {
+        guard let claude = store.snapshot, let codex = codexStore.snapshot else { return nil }
+        let claudeUsage = Int(claude.sevenDay.utilization.rounded())
+        let codexUsage = Int(codex.primary.utilization.rounded())
+        guard withTime else { return "C \(claudeUsage)% | X \(codexUsage)%" }
+
+        let claudeTime = UsageStore.timeProgress(for: claude.sevenDay, windowDuration: 7 * 24 * 3600)
+            .map { Int(($0 * 100).rounded()) }
+        let codexTime = codex.primaryWindowDuration.flatMap { duration -> Int? in
+            guard let reset = codex.primary.resetsAt, duration > 0 else { return nil }
+            let start = reset.addingTimeInterval(-duration)
+            return Int((min(1, max(0, Date().timeIntervalSince(start) / duration)) * 100).rounded())
+        }
+        func format(_ usage: Int, _ time: Int?) -> String {
+            time.map { "\(usage)%/\($0)%" } ?? "\(usage)%"
+        }
+        return "C \(format(claudeUsage, claudeTime)) | X \(format(codexUsage, codexTime))"
     }
 }
