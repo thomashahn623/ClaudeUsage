@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Baut ClaudeStatus als .app-Bundle mit LSUIElement (Menüleisten-only).
+# Baut AI Usage als .app-Bundle mit LSUIElement (Menüleisten-only).
 set -euo pipefail
 
 cd "$(dirname "$0")"
 
 CONFIG="${CONFIG:-release}"
-APP_NAME="ClaudeStatus"
+APP_NAME="AIUsage"
+BINARY_NAME="ClaudeStatus"
 APP_DIR="build/${APP_NAME}.app"
 
 # Version aus dem nächsten git-Tag ableiten (z. B. v0.3.0 → 0.3.0)
@@ -15,7 +16,7 @@ BUILD=$(git rev-list --count HEAD 2>/dev/null || echo "1")
 echo "→ swift build -c ${CONFIG}"
 swift build -c "${CONFIG}"
 
-BIN_PATH="$(swift build -c "${CONFIG}" --show-bin-path)/${APP_NAME}"
+BIN_PATH="$(swift build -c "${CONFIG}" --show-bin-path)/${BINARY_NAME}"
 
 echo "→ Bundle anlegen unter ${APP_DIR}"
 rm -rf "${APP_DIR}"
@@ -36,7 +37,7 @@ cat > "${APP_DIR}/Contents/Info.plist" <<PLIST
     <key>CFBundleName</key>
     <string>${APP_NAME}</string>
     <key>CFBundleDisplayName</key>
-    <string>Claude Status</string>
+    <string>AI Usage</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>

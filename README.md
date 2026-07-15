@@ -1,7 +1,7 @@
-# ClaudeStatus 📊
+# AI Usage 📊
 
 <p align="center">
-  <img src="docs/screenshot.png" alt="ClaudeStatus popover showing usage and time-window bars" width="320">
+  <img src="docs/screenshot.png" alt="AI Usage popover showing usage and time-window bars" width="320">
 </p>
 
 A native macOS menu bar app that shows your current Claude.ai subscription usage at a glance:
@@ -32,15 +32,15 @@ A native macOS menu bar app that shows your current Claude.ai subscription usage
 
 ## 📦 Download a prebuilt release
 
-Grab the latest `.zip` from the [Releases page](../../releases), unzip, drag `ClaudeStatus.app` into `/Applications`, double-click. Done. ✅
+Grab the latest `.zip` from the [Releases page](../../releases), unzip, drag `AIUsage.app` into `/Applications`, double-click. Done. ✅
 
 ## 🚀 Build and install
 
 ```bash
-cd ClaudeStatus
+cd ClaudeUsage
 ./build-app.sh
-mv build/ClaudeStatus.app /Applications/
-open /Applications/ClaudeStatus.app
+mv build/AIUsage.app /Applications/
+open /Applications/AIUsage.app
 ```
 
 The script builds a release version and packages it as a `.app` bundle with `LSUIElement = true`, so no Dock icon shows up. The ad-hoc signature is sufficient for local personal use.
@@ -87,7 +87,7 @@ The choice is persisted across restarts.
 
 ## 🌅 Autostart at login
 
-Until a dedicated settings toggle exists: in `System Settings → General → Login Items → +` add `ClaudeStatus.app`.
+Until a dedicated settings toggle exists: in `System Settings → General → Login Items → +` add `AIUsage.app`.
 
 ## 🚫 What this app does NOT do
 

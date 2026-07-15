@@ -21,7 +21,7 @@ struct ClaudeStatusApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Window("ClaudeStatus Einstellungen", id: "settings") {
+        Window("AI Usage Einstellungen", id: "settings") {
             SettingsView()
                 .environmentObject(store)
                 .environmentObject(codexStore)
@@ -29,13 +29,13 @@ struct ClaudeStatusApp: App {
         .windowResizability(.contentSize)
         .defaultSize(width: 460, height: 320)
 
-        Window("ClaudeStatus Verlauf", id: "history") {
+        Window("AI Usage Verlauf", id: "history") {
             HistorySheetView().environmentObject(store)
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 460, height: 420)
 
-        Window("Willkommen bei ClaudeStatus", id: "onboarding") {
+        Window("Willkommen bei AI Usage", id: "onboarding") {
             OnboardingView().environmentObject(store)
         }
         .windowResizability(.contentSize)
