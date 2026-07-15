@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-07-16
+
+### Changed
+- App in macOS, onboarding and documentation renamed from **ClaudeStatus** to
+  **AI Usage**. Existing bundle identifier, Keychain entries and local history
+  remain compatible, so configured credentials and usage history are kept.
+- New combined menu-bar modes show the weekly Claude and Codex limits side by
+  side, optionally including each window's elapsed-time progress.
+- Release workflow and artifacts now package `AIUsage.app` as
+  `AIUsage-v*.zip`.
+
+## [0.7.0] - 2026-07-15
+
+### Added
+- Optional Codex / ChatGPT usage monitoring with primary and secondary rate
+  limit windows, reset countdowns and 60-second refresh.
+- Settings for the locally stored ChatGPT session cookies required for the
+  Codex usage dashboard. Cookie fragments are consolidated into one Keychain
+  record to reduce repeated access prompts.
+- Menu-bar display modes for Codex usage, including primary and secondary
+  windows with optional elapsed-time progress.
+
+### Fixed
+- Cookie parsing accepts both raw values and complete Safari Web Inspector
+  table rows, preventing copied names and metadata from invalidating requests.
+
 ## [0.6.0] - 2026-05-25
 
 ### Added
@@ -124,7 +150,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ad-hoc signed `.app` bundle via `build-app.sh`.
 - GitHub Actions for CI and release builds.
 
-[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.3...HEAD
+[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.3...v0.6.0
 [0.5.3]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.0...v0.5.1
