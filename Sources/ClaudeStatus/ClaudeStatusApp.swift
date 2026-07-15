@@ -4,12 +4,15 @@ import AppKit
 @main
 struct ClaudeStatusApp: App {
     @StateObject private var store = UsageStore()
+    @StateObject private var codexStore = CodexUsageStore()
     @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
     @AppStorage("onboardingCompleted") private var onboardingCompleted: Bool = false
 
     var body: some Scene {
         MenuBarExtra {
-            PopoverView().environmentObject(store)
+            PopoverView()
+                .environmentObject(store)
+                .environmentObject(codexStore)
         } label: {
             MenuBarLabel(store: store,
                          displayModeRaw: displayModeRaw,
@@ -18,7 +21,9 @@ struct ClaudeStatusApp: App {
         .menuBarExtraStyle(.window)
 
         Window("ClaudeStatus Einstellungen", id: "settings") {
-            SettingsView().environmentObject(store)
+            SettingsView()
+                .environmentObject(store)
+                .environmentObject(codexStore)
         }
         .windowResizability(.contentSize)
         .defaultSize(width: 460, height: 320)

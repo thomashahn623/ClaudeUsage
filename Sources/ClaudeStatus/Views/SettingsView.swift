@@ -2,9 +2,11 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var store: UsageStore
+    @EnvironmentObject var codexStore: CodexUsageStore
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openWindow) private var openWindow
     @State private var sessionKey: String = KeychainStore.get(.sessionKey) ?? ""
+    @State private var codexSessionCookie: String = KeychainStore.get(.codexSessionCookie) ?? ""
     @AppStorage("menuBarDisplayMode") private var displayModeRaw: String = MenuBarDisplayMode.fiveHourUsage.rawValue
     @AppStorage("onboardingCompleted") private var onboardingCompleted: Bool = false
 
@@ -39,6 +41,16 @@ struct SettingsView: View {
 
             Divider()
 
+            Text("Codex / ChatGPT-Sitzungs-Cookie")
+                .font(.subheadline)
+            SecureField("__Secure-next-auth.session-token=…", text: $codexSessionCookie)
+                .textFieldStyle(.roundedBorder)
+            Text("In ChatGPT DevTools unter Application → Cookies für chatgpt.com den vollständigen Cookie-Eintrag einfügen. Er wird nur lokal im Schlüsselbund gespeichert.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            Divider()
+
             Text("Menüleisten-Anzeige").font(.subheadline)
             Picker("Anzeige in der Menüleiste", selection: $displayModeRaw) {
                 ForEach(MenuBarDisplayMode.allCases) { mode in
@@ -54,6 +66,7 @@ struct SettingsView: View {
                 Button("Speichern") {
                     Task {
                         await store.setSessionKey(sessionKey)
+                        await codexStore.setSessionCookie(codexSessionCookie)
                         dismiss()
                     }
                 }

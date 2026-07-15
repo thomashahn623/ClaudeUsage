@@ -12,6 +12,7 @@ A native macOS menu bar app that shows your current Claude.ai subscription usage
 - ⏳ Reset countdown for each limit
 - 📈 Forecast & velocity: projected utilisation at reset, based on a regression over the last 30 minutes
 - 🗂️ Local history of every snapshot, with a "Verlauf" window listing past cycles per metric
+- 🤖 Optional Codex usage panel (primary and secondary limit windows)
 
 ## ✨ Features
 
@@ -59,6 +60,14 @@ How to get the `sessionKey`:
 5. 📥 Paste it into the settings field, save.
 
 The cookie is stored in the macOS Keychain. It typically lives for a few weeks. When the icon shows a warning triangle ⚠️, it expired — repeat the steps above.
+
+## 🤖 Enable Codex usage
+
+Open **Settings** and paste the complete ChatGPT cookie string for `chatgpt.com`
+into **Codex / ChatGPT-Sitzungs-Cookie** (for example
+`__Secure-next-auth.session-token=…`). The app reads the same two rate-limit
+windows shown in Codex's Usage dashboard and stores this value separately in the
+macOS Keychain. This endpoint is unofficial and may change.
 
 ## 🎛️ Menu bar display modes
 

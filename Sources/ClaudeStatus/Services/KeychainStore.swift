@@ -4,6 +4,7 @@ import Security
 enum KeychainKey: String {
     case sessionKey = "claude_session_key"
     case orgId = "claude_org_id"
+    case codexSessionCookie = "codex_session_cookie"
 }
 
 enum KeychainStore {

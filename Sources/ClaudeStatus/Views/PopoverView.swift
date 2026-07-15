@@ -3,6 +3,7 @@ import AppKit
 
 struct PopoverView: View {
     @EnvironmentObject var store: UsageStore
+    @EnvironmentObject var codexStore: CodexUsageStore
     @Environment(\.openWindow) private var openWindow
     @State private var now = Date()
     private let ticker = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
@@ -54,8 +55,50 @@ struct PopoverView: View {
             Divider()
 
             HStack {
+                Text("Codex Usage").font(.headline)
+                Spacer()
+                if codexStore.isLoading { ProgressView().controlSize(.small) }
+            }
+
+            if let error = codexStore.lastError {
+                Label(error, systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                    .font(.callout)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if let snapshot = codexStore.snapshot {
+                metricRow(title: "Primäres Limit",
+                          metric: snapshot.primary,
+                          windowDuration: snapshot.primaryWindowDuration ?? 5 * 3600,
+                          color: .green,
+                          forecast: nil,
+                          isCritical: snapshot.primary.utilization >= 100)
+                if let secondary = snapshot.secondary {
+                    metricRow(title: "Sekundäres Limit",
+                              metric: secondary,
+                              windowDuration: snapshot.secondaryWindowDuration ?? 7 * 24 * 3600,
+                              color: .teal,
+                              forecast: nil,
+                              isCritical: secondary.utilization >= 100)
+                }
+                Text("Aktualisiert: \(snapshot.fetchedAt.formatted(date: .omitted, time: .shortened))")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            } else if !codexStore.hasCookie {
+                Text("In den Einstellungen den ChatGPT-Sitzungs-Cookie hinterlegen.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Divider()
+
+            HStack {
                 Button {
-                    Task { await store.refresh() }
+                    Task {
+                        await store.refresh()
+                        await codexStore.refresh()
+                    }
                 } label: {
                     Label("Aktualisieren", systemImage: "arrow.clockwise")
                 }
