@@ -22,7 +22,7 @@ enum ClaudeAPIError: LocalizedError {
 
 struct ClaudeAPIClient {
     private let session: URLSession
-    private let userAgent = "AIUsage/0.7.0 (macOS; SwiftUI)"
+    private let userAgent = AppVersion.userAgent
 
     init(session: URLSession = .shared) {
         self.session = session
