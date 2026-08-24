@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import Combine
 
 struct PopoverView: View {
     @EnvironmentObject var store: UsageStore

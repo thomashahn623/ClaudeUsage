@@ -7,10 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-24
+
 ### Fixed
 - User-Agent der Claude- und Codex-Requests wird jetzt aus
   `CFBundleShortVersionString` abgeleitet statt hart im Code zu stehen. Er war
   seit dem 0.8.0-Release auf `AIUsage/0.7.0` stehen geblieben.
+- `PopoverView` importiert `Combine` explizit. Ohne den Import warnte der
+  Compiler bei der `Timer.publish(...).autoconnect()`-Property, dass
+  `Publishers`/`Autoconnect` nicht verwendet werden dürfen; der Release-Build
+  ist damit wieder warnungsfrei.
 
 ## [0.8.0] - 2026-07-16
 
@@ -155,7 +161,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ad-hoc signed `.app` bundle via `build-app.sh`.
 - GitHub Actions for CI and release builds.
 
-[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.8.1...HEAD
+[0.8.1]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/thomashahn623/ClaudeUsage/compare/v0.5.3...v0.6.0
