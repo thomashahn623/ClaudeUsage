@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.8.1] - 2026-08-24
+## [0.8.1] - 2026-08-31
 
 ### Fixed
 - User-Agent der Claude- und Codex-Requests wird jetzt aus
@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Compiler bei der `Timer.publish(...).autoconnect()`-Property, dass
   `Publishers`/`Autoconnect` nicht verwendet werden dürfen; der Release-Build
   ist damit wieder warnungsfrei.
+
+### Changed
+- CI- und Release-Builds laufen jetzt auf dem `macos-26`-Runner.
+- `softprops/action-gh-release` auf v3.0.3 aktualisiert.
 
 ## [0.8.0] - 2026-07-16
 
